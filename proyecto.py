@@ -33,7 +33,7 @@ class Grafo:
         return distancias
 
 def load_balancer_monte_carlo(servidores, mensajes, iteraciones):
-    # Inicializar una lista con los servidores, sus cargas, capacidades, anchos de banda y latencias
+    # Inicializa una lista con los servidores, sus cargas, capacidades, anchos de banda y latencias
     servidores_info = []
     for servidor, capacidad in conexiones.items():
         capacidad_almacenamiento = capacidades_almacenamiento[servidor]
@@ -45,11 +45,11 @@ def load_balancer_monte_carlo(servidores, mensajes, iteraciones):
     mejor_asignacion = []
     mejor_carga = float('inf')
 
-    # Verificar si hay suficiente capacidad de almacenamiento
+    # Verifica si hay suficiente capacidad de almacenamiento
     capacidad_total = sum(info[2] for info in servidores_info)
     tamano_total_mensajes = sum(int(mensaje.strip()) for mensaje in mensajes)
 
-    # Realizar una simulación aleatoria
+    # Realiza una simulación aleatoria
     carga_actual = [0] * len(servidores_info)
     asignacion_actual = []
     for mensaje in mensajes:
@@ -60,20 +60,20 @@ def load_balancer_monte_carlo(servidores, mensajes, iteraciones):
             carga_actual[mejor_servidor] += 1
             asignacion_actual.append(servidores_info[mejor_servidor][0])
 
-    # Evaluar la función objetivo (en este caso, la carga máxima)
+    # Evalua la función objetivo (en este caso, la carga máxima)
     carga_maxima = max(carga_actual)
 
-    # Actualizar la mejor asignación
+    # Actualiza la mejor asignación
     mejor_carga = carga_maxima
     mejor_asignacion = asignacion_actual
 
-    # Imprimir la mejor asignación encontrada
+    # Imprime la mejor asignación encontrada
     print("Mejor asignación encontrada:")
     asignacion_final = Counter(mejor_asignacion)
     for servidor, carga in asignacion_final.items():
         print(f"{servidor}: {carga} mensajes")
 
-    # Imprimir el número de mensajes entregados y no entregados
+    # Imprime el número de mensajes entregados y no entregados
     mensajes_entregados = sum(asignacion_final.values())
     mensajes_no_entregados = len(mensajes) - mensajes_entregados
     print(f"Mensajes entregados: {mensajes_entregados}")
@@ -84,7 +84,7 @@ def load_balancer_monte_carlo(servidores, mensajes, iteraciones):
 
     return mejor_asignacion
 
-# Definir la topología del grafo
+# Define la topología del grafo
 grafo = Grafo()
 grafo.agregar_vertice("Router 1")
 for i in range(1, 6):
@@ -111,7 +111,7 @@ capacidades_almacenamiento = {
     "Servidor 5": 7
 }
 
-# Anchos de banda de los servidores (valores arbitrarios para el ejemplo)
+# Anchos de banda de los servidores
 anchos_banda = {
     "Servidor 1": 100,
     "Servidor 2": 80,
@@ -120,7 +120,7 @@ anchos_banda = {
     "Servidor 5": 110
 }
 
-# Latencias de los servidores (valores arbitrarios para el ejemplo)
+# Latencias de los servidores
 latencias = {
     "Servidor 1": 5,
     "Servidor 2": 10,
@@ -136,10 +136,10 @@ with open("mensajes.txt", 'r') as file:
 def visualizar_grafo(grafo, asignacion):
     G = nx.Graph()
 
-    # Agregar nodos
+    # Agrega nodos
     G.add_nodes_from(grafo.vertices)
 
-    # Agregar aristas
+    # Agrega aristas
     for vertice, aristas in grafo.aristas.items():
         for arista in aristas:
             G.add_edge(vertice, arista[0], weight=arista[1])
@@ -147,12 +147,12 @@ def visualizar_grafo(grafo, asignacion):
     # Colores para los servidores en la asignación
     colores = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow']
 
-    # Dibujar el grafo
+    # Dibuja el grafo
     pos = nx.spring_layout(G, k=0.15, iterations=50)  # Posiciones de los nodos
     fig, ax = plt.subplots(figsize=(12, 8))  # Aumentar el tamaño de la figura
     nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=2000, font_size=12, font_weight='bold')  # Aumentar el tamaño de la fuente
 
-    # Lista para almacenar las líneas que representarán los mensajes
+    # Lista para almacenar las líneas
     lineas_mensajes = []
 
     # Función auxiliar para actualizar la animación
@@ -170,15 +170,14 @@ def visualizar_grafo(grafo, asignacion):
 
         return lineas_mensajes
 
-    # Configurar la animación
+    # Configura la animación
     ax.set_title("Topología del Grafo y Flujo de Mensajes", fontsize=16, fontweight='bold')  # Aumentar el tamaño del título
     ani = animation.FuncAnimation(fig, animar, frames=len(asignacion), interval=500, blit=True, repeat=False)
 
     plt.tight_layout()  # Ajustar el layout para evitar recortes
     plt.show()
 
-# Realizar la simulación de Monte Carlo
+# Realiza la simulación de Monte Carlo
 mejor_asignacion = load_balancer_monte_carlo(conexiones.keys(), mensajes, iteraciones=1)
 
-# Visualizar el grafo y la animación
 visualizar_grafo(grafo, mejor_asignacion)
